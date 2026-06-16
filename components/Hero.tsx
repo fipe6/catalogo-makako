@@ -1,6 +1,10 @@
-import { products } from '@/data/products';
+import type { Product } from '@/data/products';
 
-export default function Hero() {
+interface HeroProps {
+  products: Product[];
+}
+
+export default function Hero({ products }: HeroProps) {
   const inStockCount = products.filter((p) => p.inStock).length;
   const categoryCount = new Set(products.map((p) => p.category)).size;
 
