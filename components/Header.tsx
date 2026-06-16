@@ -1,15 +1,31 @@
+'use client';
+
+import { useState } from 'react';
+import Image from 'next/image';
 import { WHATSAPP_NUMBER } from '@/data/products';
 
 export default function Header() {
+  const [logoError, setLogoError] = useState(false);
   const waUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent('Hola! Quiero consultar sobre sus suplementos 💪')}`;
 
   return (
     <header className="site-header">
       <div className="logo-wrap">
-        {/* Replace with <Image src="/images/logo.webp" alt="Makako Fit" height={44} priority /> when you have the logo file */}
-        <span className="logo-text">
-          MAKAKO <span>FIT</span>
-        </span>
+        {!logoError ? (
+          <Image
+            src="/images/logo.webp"
+            alt="Makako Fit"
+            height={44}
+            width={140}
+            priority
+            style={{ objectFit: 'contain', height: '44px', width: 'auto' }}
+            onError={() => setLogoError(true)}
+          />
+        ) : (
+          <span className="logo-text">
+            MAKAKO <span>FIT</span>
+          </span>
+        )}
       </div>
 
       <a href={waUrl} target="_blank" rel="noopener noreferrer" className="btn-whatsapp">
