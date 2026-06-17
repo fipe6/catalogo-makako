@@ -1,9 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabase, getSupabaseAdmin, mapProductRow } from '@/lib/supabase';
+import { getSupabase, getSupabaseAdmin, mapProductRow } from '@/lib/supabase';
 import { isAdminAuthenticated } from '@/lib/auth';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET() {
-  const { data, error } = await supabase
+  const { data, error } = await getSupabase()
     .from('products')
     .select('*')
     .order('sort_order', { ascending: true });

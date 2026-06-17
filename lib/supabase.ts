@@ -1,19 +1,33 @@
-import { createClient } from '@supabase/supabase-js';
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import type { Product } from '@/data/products';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+let cachedClient: SupabaseClient | null = null;
+let cachedAdmin: SupabaseClient | null = null;
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
-
-export function getSupabaseAdmin() {
-  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!serviceKey) {
-    throw new Error('Falta configurar SUPABASE_SERVICE_ROLE_KEY');
+export function getSupabase(): SupabaseClient {
+  if (!cachedClient) {
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+    if (!url || !key) {
+      throw new Error('Falta configurar NEXT_PUBLIC_SUPABASE_URL o NEXT_PUBLIC_SUPABASE_ANON_KEY');
+    }
+    cachedClient = createClient(url, key);
   }
-  return createClient(supabaseUrl, serviceKey, {
-    auth: { autoRefreshToken: false, persistSession: false },
-  });
+  return cachedClient;
+}
+
+export function getSupabaseAdmin(): SupabaseClient {
+  if (!cachedAdmin) {
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    if (!url || !serviceKey) {
+      throw new Error('Falta configurar NEXT_PUBLIC_SUPABASE_URL o SUPABASE_SERVICE_ROLE_KEY');
+    }
+    cachedAdmin = createClient(url, serviceKey, {
+      auth: { autoRefreshToken: false, persistSession: false },
+    });
+  }
+  return cachedAdmin;
 }
 
 interface ProductRow {
