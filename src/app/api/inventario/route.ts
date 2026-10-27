@@ -8,10 +8,9 @@ export async function GET() {
   console.log('[API /inventario] Supabase URL:', process.env.NEXT_PUBLIC_SUPABASE_URL)
 
   const { data, error } = await supabase
-    .from('inventario')
-    .select('id, producto, stock_actual, stock_minimo, precio_venta, activo, updated_at')
+    .from('catalogo_publico')
+    .select('id, producto, stock_actual, stock_minimo, precio_venta, imagen_url, activo, updated_at')
     .eq('activo', true)
-    .gt('stock_actual', 0)
     .order('producto')
 
   console.log('[API /inventario] Data recibida:', data?.length, 'productos')

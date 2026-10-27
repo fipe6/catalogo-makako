@@ -8,6 +8,7 @@ type Producto = {
   stock_actual: number
   stock_minimo: number | null
   precio_venta: number | null
+  imagen_url: string | null
   activo: boolean
   updated_at: string | null
 }
@@ -20,6 +21,14 @@ function stockStatus(actual: number, minimo: number | null) {
   if (actual <= 0) return { label: 'Agotado', className: 'stock-badge stock-out' }
   if (minimo && actual <= minimo) return { label: 'Quedan pocos', className: 'stock-badge stock-low' }
   return { label: 'Disponible', className: 'stock-badge stock-ok' }
+}
+
+function Foto({ p }: { p: Producto }) {
+  if (p.imagen_url) {
+    return <img className="card-img" src={p.imagen_url} alt={p.producto} loading="lazy" />
+  }
+  const iniciales = p.producto.split(/\s+/).slice(0, 2).map((w) => w[0]).join('').toUpperCase()
+  return <div className="card-img card-img-vacia" aria-hidden="true">{iniciales}</div>
 }
 
 export function Catalogo({ initialData }: { initialData: Producto[] }) {
@@ -78,12 +87,6 @@ export function Catalogo({ initialData }: { initialData: Producto[] }) {
 
   return (
     <>
-      <div className="debug-bar">
-        Supabase: {process.env.NEXT_PUBLIC_SUPABASE_URL?.replace('https://', '').split('.')[0]} |
-        Productos: {productos.length} |
-        Fuente: tabla inventario (directo)
-      </div>
-
       <div className="toolbar">
         <span>
           {disponibles.length} disponibles
@@ -109,6 +112,7 @@ export function Catalogo({ initialData }: { initialData: Producto[] }) {
             const status = stockStatus(p.stock_actual, p.stock_minimo)
             return (
               <div key={p.id} className="card">
+                <Foto p={p} />
                 <div className="card-name">{p.producto}</div>
                 <div className="card-bottom">
                   <span className="card-price">
@@ -129,7 +133,8 @@ export function Catalogo({ initialData }: { initialData: Producto[] }) {
           </div>
           <div className="grid">
             {agotados.map((p) => (
-              <div key={p.id} className="card" style={{ opacity: 0.5 }}>
+              <div key={p.id} className="card card-agotado">
+                <Foto p={p} />
                 <div className="card-name">{p.producto}</div>
                 <div className="card-bottom">
                   <span className="card-price">
